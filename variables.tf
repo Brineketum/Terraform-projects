@@ -1,34 +1,39 @@
-variable "region" {
-  description = "name region"
-  default     = "us-east-1"
+variable "project_name" {
+  type        = string
+  description = "This defines the bucket name for the project name"
 }
 
 variable "vpc_cidr" {
   type        = string
-  description = "This configures the vpc cidr"
-  default     = "10.0.0.0/16"
+  description = "This defines the bucket name for the vpc cidr"
 }
 
-variable "project_name" {
+variable "public_subnet1_az1_cidr" {
   type        = string
-  description = "This configures the project name"
-  default     = "ecs-fargate"
+  description = "This defines the cidr for subnet1"
 }
 
-variable "private_subnet1_az1_cidr" {
+variable "public_subnet2_az2_cidr" {
   type        = string
-  description = "This configures the public subnet1 cidr"
-  default     = "10.0.1.0/24"
+  description = "This defines the cidr subnet2"
 }
 
-variable "private_subnet2_az2_cidr" {
+variable "instance_type" {
   type        = string
-  description = "This configures the public subnet2 cidr"
-  default     = "10.0.2.0/24"
+  description = "This defines the instance type for the asg"
 }
 
-variable "name_prefix" {
+variable "imagge_id" {
+  
+  description = "This defines the image id for the asg"
+}
+
+variable "key_name" {
   type        = string
-  description = "This configures a name variable to name other resources"
-  default     = "week19test"
+  description = "This defines the existing keyname for the instance asg"
+}
+
+variable "region" {
+  type        = string
+  description = "This defines the region"
 }

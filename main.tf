@@ -1,46 +1,50 @@
-resource "aws_ecs_cluster" "cluster" {
-  name = "${var.name_prefix}-cluster"
-}
-
-resource "aws_ecs_cluster_capacity_providers" "cluster" {
-  cluster_name = aws_ecs_cluster.cluster.name
-
-  capacity_providers = ["FARGATE_SPOT", "FARGATE"]
-
-  default_capacity_provider_strategy {
-    capacity_provider = "FARGATE_SPOT"
+terraform {
+  backend "s3" {
+    bucket = "mybucketforterraformtesting718"
+    key    = "state/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
-module "ecs-fargate" {
-  source = "umotif-public/ecs-fargate/aws"
 
-  name_prefix        = "${var.name_prefix}-fargate"
-  vpc_id             = aws_vpc.vpc.id
-  private_subnet_ids = [aws_subnet.private_subnet_az1.id, aws_subnet.private_subnet_az2.id]
-  cluster_id         = aws_ecs_cluster.cluster.id
 
-  task_container_image = "centos"
+module "vpc" {
+  source                  = "./vpc"
+  project_name            = var.project_name
+  vpc_cidr                = var.vpc_cidr
+  public_subnet1_az1_cidr = var.public_subnet1_az1_cidr
+  public_subnet2_az2_cidr = var.public_subnet2_az2_cidr
 
-  // public ip is needed for default vpc, default is false
-  task_container_assign_public_ip = true
 
-  // port, default protocol is HTTP
-  task_container_port = 80
-  task_definition_cpu    = 256
-  task_definition_memory = 512
-  
-  load_balanced = false
-  
-
-  health_check = {
-    port = "traffic-port"
-    path = "/"
-  }
-
-  tags = {
-    Environment = "dev"
-    Project     = "test"
-
-  }
 }
+
+module "security-group" {
+  source = "./security-group"
+  vpc_id = module.vpc.vpc_id
+
+
+}
+
+module "asg" {
+  source             = "./asg"
+  instance_type      = var.instance_type
+  imagge_id           = var.imagge_id
+  key_name           = var.key_name
+  public_subnet1_az1 = module.vpc.public_subnet1_az1
+  public_subnet1_az2 = module.vpc.public_subnet1_az2
+  load_balancer      = module.alb.load_balancer
+  target_group_arn   = module.alb.target_group_arn
+  project_name       = var.project_name
+  ec2_security_group = module.security-group.ec2_security_group
+
+}
+
+module "alb" {
+  source             = "./alb"
+  vpc_id             = module.vpc.vpc_id
+  subnet_ids         = module.vpc.subnet_ids
+  project_name       = var.project_name
+  alb_security_group = module.security-group.alb_security_group
+
+}
+    
