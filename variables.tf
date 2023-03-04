@@ -1,6 +1,4 @@
-#---/root---
-
-#vpc
+#---/Modules/vpc---
 variable "project_name" {
   type        = string
   description = "This configures the vpc name"
@@ -25,26 +23,4 @@ variable "private_subnet2_az2_cidr" {
   type        = string
   description = "This configures the private subnet2 cidr"
 }
-
-#ec2
-variable "ami" {}
-variable "instance_type" {}
-variable "ec2_web_tag_name" {}
-variable "keyname" {}
-
-#database
-variable "identifier" {}
-variable "engine" {}
-variable "engine_version" {}
-variable "db_name" {}
-variable "username" {
-  sensitive = true
-}
-variable "password" {
-  sensitive = true
-}
-
-
-
-
 
